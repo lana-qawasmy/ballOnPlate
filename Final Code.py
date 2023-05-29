@@ -25,25 +25,26 @@ def ballFinder():
     #while True:
         ret, frame = cap.read()
         result = (0,0)
+        lower_value = np.array([10, 100, 120])
+        higher_value = np.array([25,255,255])
+        
         if ret:
             frame = frame[:, 93:550, :]
             hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-            lower_value = np.array([10, 100, 120])
-            higher_value = np.array([25,255,255])
             mask = cv.inRange(hsv, lower_value, higher_value)
             #mask = cv.blur(mask,(6,6))                        
             #mask = cv.erode(mask, None, iterations=2)         
             #mask = cv.dilate(mask, None, iterations=2)
-            #cv.imshow("Frame", frame)
-            #key = cv.waitKey(1)
+            cv.imshow("Frame", frame)
+            key = cv.waitKey(1)
 
             contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
             #print(contours)
-           # cv.imshow("ctr", mask)
+            cv.imshow("ctr", mask)
             #key = cv.waitKey(1)
-            i = 0 
+           
             for cnt in contours:
-                i = i + 1
+                
                 area = cv.contourArea(cnt)
                 if area > 500:
                     (x,y), radius = cv.minEnclosingCircle(cnt)
@@ -52,8 +53,8 @@ def ballFinder():
                     radius = int(radius)
                     if radius > 20:
                         result = (x,y)
-                print(i)
-                       # print(result)
+               
+                        print(result)
         return(result)
 
 #-------------------------------- Calibration Part  ----------------------------------------------------------------------------    
@@ -65,7 +66,7 @@ def CenterCalibration():
             frame = frame[:,93:550,:]
             cv.circle(frame,(center_x,center_y),3,[255,130,130],3)
             cv.imshow("Calibration", frame)
-           # cv.waitKey(1)
+            cv.waitKey(1)
         else:
             pass
            
@@ -101,7 +102,7 @@ def initialPos():
 def move_motors(pid):
     for i in np.arange(0,2,1):
         angle = initial_angle[i] - (pid[i]/150.0 * 20)
-        print(pid[i])
+       # print(pid[i])
 #         print(angle)
         #angle = np.floor(angle)
         
@@ -305,10 +306,10 @@ motor_select = tk.StringVar(window)
 motor0.set(str(initial_angle[0]))
 motor1.set(str(initial_angle[1]))
 
-motor_select.set("2")
+motor_select.set("0")
 
-e0 = tk.Spinbox(window, from_=-0.25, to=0.25,values=(-0.25, -0.15, -0.05, 0, 0.15, 0.25), command=set_angle, width=4, textvariable=motor0)
-e1 = tk.Spinbox(window, from_= -0.25, to=0.25, values=(-0.25, -0.15, -0.05, 0, 0.15, 0.25), command=set_angle, width=4, textvariable=motor1)
+e0 = tk.Spinbox(window, from_=-0.25, to=0.25,values=(-0.25, -0.15, -0.05, 0,0.05, 0.15, 0.25), command=set_angle, width=4, textvariable=motor0)
+e1 = tk.Spinbox(window, from_= -0.25, to=0.25, values=(-0.25, -0.15, -0.05, 0,0.05, 0.15, 0.25), command=set_angle, width=4, textvariable=motor1)
 #print(e0.get())
 
 motor_selector = tk.Spinbox(window, from_=0, to=1, width=2, textvariable=motor_select)
@@ -331,10 +332,8 @@ set.place(x=450, y = 400 )
 #-------------------------------- Operation Part  ----------------------------------------------------------------------------    
 #Final order of operations : 
 initialPos()
-#ballFinder()
 CenterCalibration()
 cv.destroyAllWindows()
 main()
 window.mainloop()
-
 
